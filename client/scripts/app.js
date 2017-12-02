@@ -6,6 +6,11 @@ app.init = () => {
 
 app.friends = {};
 
+app.rooms = {};
+
+// app.currentRoom;
+// app.currentRoom[id] = undefined;
+
 app.handleUsernameClick = (div) => {
   const className = div.innerHTML;
   app.friends[className] = className;
@@ -14,16 +19,32 @@ app.handleUsernameClick = (div) => {
 };
 
 app.handleSubmit = () => {
+  let foundRoom = $(".subtitle").html();
+  console.log(foundRoom, 1)
   let message = {
     username: location.search.slice(10),
     text: document.getElementById("comment").value,
-    roomname: "lobby"
+    roomname: foundRoom
   };
-  console.log(message);
-  console.log(new Date());
+  $("#comment").val('');
   app.send(message);
-  app.renderMessage(message);
+  // if in room run select room else run fetch
+  if (foundRoom !== undefined) {
+    console.log('aeurhakeurhakuerhakeurh')
+    app.selectRoom(foundRoom);
+  } else {
+    app.fetch();
+  }
 };
+
+app.createRoom = () => {
+  let room = document.getElementById("createroom").value;
+  $("#createroom").val('');
+  if (!app.rooms[room]) {
+    app.renderRoom(room);
+  }
+  app.selectRoom(room);
+}
 
 app.server = 'http://parse.nyc.hackreactor.com/chatterbox/classes/messages'
 
@@ -42,17 +63,22 @@ app.send = (message) => {
 };
 
 app.fetch = () => {
+  app.clearMessages();
   $.ajax({
     url: app.server,
     type: 'GET',
     data: { "order": "-createdAt" },
     success: function (data) {
-      console.log(data);
       console.log('chatterbox: Messages recieved');
       let messages = data.results;
       messages.reverse();
       messages.forEach((message) => {
         app.renderMessage(message);
+        if (message.roomname && !app.rooms[message.roomname]) {
+          let room = message.roomname;
+          app.rooms[room] = room;
+          app.renderRoom(room);
+        }
       });
     },
     error: function (data) {
@@ -66,15 +92,10 @@ app.clearMessages = () => {
 }
 
 app.renderMessage = (message) => {
-  let username = message.username;
-  let text = message.text;
+  let username = encodeURI(message.username);
+  let text = encodeURI(message.text);
   let createdAt = message.createdAt;
-  // if (message.createdAt) {
-  //   let createdAt = message.createdAt;
-  // } else {
-  //   let createdAt = new Date();
-  // }
-  //change data format;
+  
   $('#chats').prepend("<div class='panel panel-default'><div class='panel-body'>" +
   "<div class='username " + 
    username + 
@@ -89,8 +110,44 @@ app.renderMessage = (message) => {
   "</div></div></div>");
 }
 
-app.renderRoom = (lobby) => {
-  $("#roomSelect").append($('<a href="#">' + lobby + '</a>'));
+app.renderRoom = (room) => {
+  $(".dropdown-menu").append($('<li><a id='+ room + ' href="#" onclick=app.selectRoom(this.id)>' + room + '</a></li>'));
+}
+
+app.selectRoom = (room) => {
+  app.clearMessages();
+  $(".subtitle").remove();
+  console.log(room)
+  if (room === "allrooms") {
+    console.log("all rooms")
+    app.fetch();
+  } else {
+    console.log('else')
+    $("#title").append("<h3 class='subtitle' id='" + room + "'>" + room + "<h3>");
+    $.ajax({
+        url: app.server,
+        type: 'GET',
+        data: { "order": "-createdAt" },
+        success: function (data) {
+          console.log('chatterbox: Messages recieved');
+          let messages = data.results;
+          messages.reverse();
+          messages.forEach((message) => {
+            if (message.roomname === room) {
+              app.renderMessage(message);
+            }
+            if (message.roomname && !app.rooms[message.roomname]) {
+              let room = message.roomname;
+              app.rooms[room] = room;
+              app.renderRoom(room);
+            }
+          });
+        },
+        error: function (data) {
+          console.error('chatterbox: Failed to recieve messages', data);
+        }
+      });
+  }
 }
 
 app.init();

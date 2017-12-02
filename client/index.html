@@ -27,7 +27,7 @@
   </head>
   <body>
     <div id="main" class="container-fluid">
-      <h1>chatterbox</h1>
+      <h1 id="title">chatterbox</h1>
       <!-- Your HTML goes here! -->
 
       <br>
@@ -38,18 +38,23 @@
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-          <li><a href="#">Room</a></li>
-          <li><a href="#">Room</a></li>
-          <li><a href="#">Roomba</a></li>
+          <li><a onclick=app.selectRoom(this.id) id="allrooms" href="#">All</a></li>
         </ul>
+      </div>
+
+      <br>
+
+      <div class="form-group">
+        <input class="form-control" id="createroom" placeholder="Enter new roomname">
+        <button class="btn btn-default" onclick="app.createRoom()">Submit</button>
       </div>
 
       <br>
       
         <div class="form-group">
-          <textarea class="form-control" rows="1" id="comment"></textarea>
+          <textarea class="form-control" rows="3" id="comment" placeholder="Enter new message"></textarea>
         </div>
-        <button id = "send" class="btn btn-default submit" onclick="app.handleSubmit()">Submit</button>
+        <button class="btn btn-default" onclick="app.handleSubmit()">Submit</button>
       
     </div>
     <div id="chats" class="container-fluid"></div>

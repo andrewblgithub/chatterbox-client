@@ -8,9 +8,6 @@ app.friends = {};
 
 app.rooms = {};
 
-// app.currentRoom;
-// app.currentRoom[id] = undefined;
-
 app.handleUsernameClick = (div) => {
   const className = div.innerHTML;
   app.friends[className] = className;
@@ -42,6 +39,7 @@ app.createRoom = () => {
   $("#createroom").val('');
   if (!app.rooms[room]) {
     app.renderRoom(room);
+    app.rooms[room] = room;
   }
   app.selectRoom(room);
 }
@@ -80,6 +78,9 @@ app.fetch = () => {
           app.renderRoom(room);
         }
       });
+      for (let friend in app.friends) {
+        $("." + friend).css("font-weight", "Bold");
+      }
     },
     error: function (data) {
       console.error('chatterbox: Failed to recieve messages', data);
@@ -142,6 +143,9 @@ app.selectRoom = (room) => {
               app.renderRoom(room);
             }
           });
+          for (let friend in app.friends) {
+            $("." + friend).css("font-weight", "Bold");
+          }
         },
         error: function (data) {
           console.error('chatterbox: Failed to recieve messages', data);

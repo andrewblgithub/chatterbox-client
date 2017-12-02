@@ -1,12 +1,12 @@
-const app = {};
+const app = {
+  friends: {},
+  rooms: {}
+};
 
 app.init = () => {
   app.fetch();
+  //setInterval(app.fetch, 3000);
 };
-
-app.friends = {};
-
-app.rooms = {};
 
 app.handleUsernameClick = (div) => {
   const className = div.innerHTML;
@@ -15,14 +15,12 @@ app.handleUsernameClick = (div) => {
     $("." + className).css("font-weight", "normal");
   } else {
     app.friends[className] = className;
-    console.log(app.friends);
     $("." + className).css("font-weight", "Bold");
   }
 };
 
 app.handleSubmit = () => {
   let foundRoom = $(".subtitle").html();
-  console.log(foundRoom, 1)
   let message = {
     username: location.search.slice(10),
     text: document.getElementById("comment").value,
@@ -30,9 +28,7 @@ app.handleSubmit = () => {
   };
   $("#comment").val('');
   app.send(message);
-  // if in room run select room else run fetch
   if (foundRoom !== undefined) {
-    console.log('aeurhakeurhakuerhakeurh')
     app.selectRoom(foundRoom);
   } else {
     app.fetch();
@@ -98,8 +94,8 @@ app.clearMessages = () => {
 }
 
 app.renderMessage = (message) => {
-  let username = encodeURI(message.username);
-  let text = encodeURI(message.text);
+  let username = _.escape(message.username);
+  let text = _.escape(message.text);
   let createdAt = message.createdAt;
   
   $('#chats').prepend("<div class='panel panel-default'><div class='panel-body'>" +
@@ -123,12 +119,9 @@ app.renderRoom = (room) => {
 app.selectRoom = (room) => {
   app.clearMessages();
   $(".subtitle").remove();
-  console.log(room)
   if (room === "allrooms") {
-    console.log("all rooms")
     app.fetch();
   } else {
-    console.log('else')
     $("#title").append("<h3 class='subtitle' id='" + room + "'>" + room + "<h3>");
     $.ajax({
         url: app.server,

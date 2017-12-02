@@ -4,9 +4,11 @@
     <meta charset="utf-8">
     <title>chatterbox</title>
     <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <!-- dependencies -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="bower_components/underscore/underscore.js"></script>
     <script>
       // YOU DO NOT NEED TO EDIT THIS CODE
@@ -24,10 +26,32 @@
     <script src="scripts/app.js"></script>
   </head>
   <body>
-    <div id="main">
+    <div id="main" class="container-fluid">
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
+
+      <br>
+      
+      <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          Select Room
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+          <li><a href="#">Room</a></li>
+          <li><a href="#">Room</a></li>
+          <li><a href="#">Roomba</a></li>
+        </ul>
+      </div>
+
+      <br>
+      
+        <div class="form-group">
+          <textarea class="form-control" rows="1" id="comment"></textarea>
+        </div>
+        <button id = "send" class="btn btn-default submit" onclick="app.handleSubmit()">Submit</button>
+      
     </div>
-    <div id="chats"></div>
+    <div id="chats" class="container-fluid"></div>
   </body>
 </html>

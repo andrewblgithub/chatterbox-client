@@ -10,9 +10,14 @@ app.rooms = {};
 
 app.handleUsernameClick = (div) => {
   const className = div.innerHTML;
-  app.friends[className] = className;
-  console.log(app.friends);
-  $("." + className).css("font-weight", "Bold");
+  if (app.friends[className]) {
+    delete app.friends[className];
+    $("." + className).css("font-weight", "normal");
+  } else {
+    app.friends[className] = className;
+    console.log(app.friends);
+    $("." + className).css("font-weight", "Bold");
+  }
 };
 
 app.handleSubmit = () => {

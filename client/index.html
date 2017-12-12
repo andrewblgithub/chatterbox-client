@@ -24,6 +24,17 @@
     <!-- your scripts -->
     <script src="env/config.js"></script>
     <script src="scripts/app.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+          $('#comment').keypress(function(e){
+            if(e.which == 13){
+              app.handleSubmit();
+              $(this).val('').focus();
+              return false;
+            }
+          });
+      });
+    </script>
   </head>
   <body>
     <div id="main" class="container-fluid">
@@ -44,17 +55,19 @@
 
       <br>
 
-      <div class="form-group">
-        <input class="form-control" id="createroom" placeholder="Enter new roomname">
-        <button class="btn btn-default" onclick="app.createRoom()">Submit</button>
+      <div class="input-group">
+        <input class="form-control" type="text" id="createroom" placeholder="Enter new roomname">
+        <span class="input-group-btn">
+          <button class="btn btn-default" onclick="app.createRoom()">Submit</button>
+        </span>
       </div>
 
       <br>
       
         <div class="form-group">
-          <textarea class="form-control" rows="3" id="comment" placeholder="Enter new message"></textarea>
+          <textarea class="form-control" rows="3" id="comment" placeholder="Enter new message" autofocus></textarea>
         </div>
-        <button class="btn btn-default" onclick="app.handleSubmit()">Submit</button>
+        <button class="btn btn-default" onclick="app.handleSubmit()" style="float:right">Submit</button>
       
     </div>
     <div id="chats" class="container-fluid"></div>

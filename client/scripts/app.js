@@ -1,11 +1,19 @@
 const app = {
   friends: {},
-  rooms: {}
+  rooms: {},
+  latestMessageTime: null
 };
 
 app.init = () => {
   app.fetch();
-  //setInterval(app.fetch, 3000);
+  setInterval(()=> {
+    let foundRoom = $('.subtitle').html();
+    if (foundRoom !== undefined) {
+      app.fetch(foundRoom);
+    } else {
+      app.fetch();
+    }
+  }, 3000);
 };
 
 app.handleUsernameClick = (div) => {
@@ -29,7 +37,7 @@ app.handleSubmit = () => {
   $('#comment').val('');
   app.send(message);
   if (foundRoom !== undefined) {
-    app.selectRoom(foundRoom);
+    app.fetch(foundRoom);
   } else {
     app.fetch();
   }
@@ -61,8 +69,7 @@ app.send = (message) => {
   });
 };
 
-app.fetch = () => {
-  app.clearMessages();
+app.fetch = (currentRoom) => {
   $.ajax({
     url: app.server,
     type: 'GET',
@@ -72,11 +79,18 @@ app.fetch = () => {
       let messages = data.results;
       messages.reverse();
       messages.forEach((message) => {
-        app.renderMessage(message);
-        if (message.roomname && !app.rooms[message.roomname]) {
-          let room = message.roomname;
-          app.rooms[room] = room;
-          app.renderRoom(room);
+        if (!app.latestMessageTime || message.createdAt > app.latestMessageTime) {
+          app.latestMessageTime = message.createdAt;
+          if (currentRoom && message.roomname === currentRoom) {
+            app.renderMessage(message);
+          } else {
+            app.renderMessage(message);
+          }
+          if (message.roomname && !app.rooms[message.roomname]) {
+            let room = message.roomname;
+            app.rooms[room] = room;
+            app.renderRoom(room);
+          }
         }
       });
       for (let friend in app.friends) {
@@ -119,36 +133,12 @@ app.renderRoom = (room) => {
 app.selectRoom = (room) => {
   app.clearMessages();
   $('.subtitle').remove();
+  app.latestMessageTime = null;
   if (room === 'allrooms') {
     app.fetch();
   } else {
     $('#title').append('<h3 class=\'subtitle\' >' + room + '<h3>');
-    $.ajax({
-      url: app.server,
-      type: 'GET',
-      data: { 'order': '-createdAt' },
-      success: function (data) {
-        console.log('chatterbox: Messages recieved');
-        let messages = data.results;
-        messages.reverse();
-        messages.forEach((message) => {
-          if (message.roomname === room) {
-            app.renderMessage(message);
-          }
-          if (message.roomname && !app.rooms[message.roomname]) {
-            let room = message.roomname;
-            app.rooms[room] = room;
-            app.renderRoom(room);
-          }
-        });
-        for (let friend in app.friends) {
-          $('.' + friend).css('font-weight', 'Bold');
-        }
-      },
-      error: function (data) {
-        console.error('chatterbox: Failed to recieve messages', data);
-      }
-    });
+    app.fetch(room);
   }
 };
 
